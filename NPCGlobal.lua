@@ -33,10 +33,8 @@ function playNPCAnimation(npc, animationName)
 		npc.lastTrack:Stop()
 	end
 	
-	if npc.lastTrack ~= animation then
-		animation:Play()
-		npc.lastTrack = animation
-	end
+	animation:Play()
+	npc.lastTrack = animation
 end
 
 
