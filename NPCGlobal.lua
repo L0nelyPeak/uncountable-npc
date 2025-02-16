@@ -25,10 +25,6 @@ function playNPCAnimation(npc, animationName)
 		return
 	end
 	
-	if npc.lastTrack == animation then
-		return
-	end
-	
 	if npc.lastTrack then
 		npc.lastTrack:Stop()
 	end
@@ -112,7 +108,7 @@ local function SpawnNPC(owner)
 			Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 		end
 	end
-
+	
 	-- set up npc
 
 	local i = npcCurrentAmount + 1
@@ -140,13 +136,11 @@ local function SpawnNPC(owner)
 	end
 	-- set up collisions
 	for _, bodypart in ipairs(logic[i].npc:GetDescendants()) do
-		if not bodypart:IsA('BasePart') then
-			continue
-		end
-		
-		bodypart.CollisionGroup = 'NPC'
-		if bodypart.Name ~= "HumanoidRootPart" then
-			bodypart.CanCollide = false
+		if bodypart:IsA('BasePart') then
+			bodypart.CollisionGroup = 'NPC'
+			if bodypart.Name ~= "HumanoidRootPart" then
+				bodypart.CanCollide = false
+			end
 		end
 	end
 
@@ -215,8 +209,14 @@ while task.wait() do
 			if npc.nextPoint == nil then
 				-- set previous WP as target WP
 				local accessiblePoints = npc.currentPoint:GetChildren()
-				if #accessiblePoints - 1 <= 0 then
-					npc.nextPoint = npc.currentPoint:FindFirstChildOfClass('ObjectValue').Value
+				if #accessiblePoints <= 1 then
+					local objValue = npc.currentPoint:FindFirstChildOfClass('ObjectValue')
+					if objValue then
+						npc.nextPoint = objValue.Value
+					else
+						npc.state = 'idle'
+					end
+					
 					continue
 				end
 				
@@ -234,7 +234,7 @@ while task.wait() do
 					npc.nextPoint = wp.Value
 				end
 			else
-				-- move if we dont already moving
+				-- move if we not already moving
 				if npc.humanoid.MoveDirection == Vector3.zero then
 					npc.humanoid:MoveTo(npc.nextPoint.Position)
 					playNPCAnimation(npc, "walk")
