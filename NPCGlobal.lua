@@ -140,11 +140,13 @@ local function SpawnNPC(owner)
 	end
 	-- set up collisions
 	for _, bodypart in ipairs(logic[i].npc:GetDescendants()) do
-		if bodypart:IsA('BasePart') then
-			bodypart.CollisionGroup = 'NPC'
-			if bodypart.Name ~= "HumanoidRootPart" then
-				bodypart.CanCollide = false
-			end
+		if not bodypart:IsA('BasePart') then
+			continue
+		end
+		
+		bodypart.CollisionGroup = 'NPC'
+		if bodypart.Name ~= "HumanoidRootPart" then
+			bodypart.CanCollide = false
 		end
 	end
 
