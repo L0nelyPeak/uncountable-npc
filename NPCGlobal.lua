@@ -46,7 +46,7 @@ local function CaptureNPC(player: Player, npc)
 	end
 	local humanoid = character:FindFirstChild('Humanoid')
 	local hrp = character:FindFirstChild('HumanoidRootPart')
-	if not hrp or not humanoid then
+	if not (hrp and humanoid) then
 		return
 	end
 	if humanoid.Health < 1 then
@@ -90,7 +90,7 @@ local function SpawnNPC(owner)
 		return Players:CreateHumanoidModelFromUserId(randomID)
 	end)
 	
-	if not success or not npcModel then
+	if not (success and npcModel) then
 		return
 	end
 	
@@ -117,7 +117,7 @@ local function SpawnNPC(owner)
 	logic[i].state = 'patrol'
 	logic[i].npc = npcModel
 	logic[i].humanoid = npcModel:FindFirstChild('Humanoid')
-	logic[i].Animator = logic[i].humanoid:FindFirstChild('Animator')
+	logic[i].Animator = logic[i].humanoid:WaitForChild('Animator')
 	logic[i].hrp = npcModel:FindFirstChild('HumanoidRootPart')
 	logic[i].currentPosition = logic[i].hrp.Position
 	logic[i].id = randomID
@@ -156,15 +156,11 @@ local function SpawnNPC(owner)
 	-- spawn npc
 
 	-- chosing random WP as spawn
-	for number, wp in ipairs(waypointFolder:GetChildren()) do
-		if number == i then
-			logic[i].npc:PivotTo( wp.CFrame )
-			logic[i].currentPoint = wp
-		elseif i > #waypointFolder:GetChildren() then
-			logic[i].npc:PivotTo( wp.CFrame )
-			logic[i].currentPoint = wp
-		end
-	end
+	local waypoints = waypointFolder:GetChildren()
+	local rnd = math.random(1, #waypoints)
+	logic[i].currentPoint = waypoints[rnd]
+	logic[i].npc:PivotTo( logic[i].currentPoint.CFrame )
+	
 	-- spawn npc
 	logic[i].npc.Parent = npcFolder
 	logic[i].hrp:SetNetworkOwner(nil)
@@ -260,14 +256,15 @@ while task.wait() do
 			end
 			
 			local ownerHumanoid = npc.owner:FindFirstChild("Humanoid")
-			if not npc.owner:FindFirstChild('HumanoidRootPart') or not ownerHumanoid then
+			local ownerHRP = npc.owner:FindFirstChild('HumanoidRootPart')
+			if not (ownerHRP and ownerHumanoid) then
 				npc.owner = nil
 				npc.state = "idle"
 				continue
 			end
 			
 			
-			local targetPos = (npc.owner.HumanoidRootPart.CFrame * CFrame.new(0,0,3)).Position
+			local targetPos = (ownerHRP.CFrame * CFrame.new(0,0,3)).Position
 			if npc.humanoid.MoveDirection == Vector3.zero then
 				npc.humanoid:MoveTo(targetPos)
 			end
