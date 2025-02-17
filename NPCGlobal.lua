@@ -117,7 +117,7 @@ local function SpawnNPC(owner)
 	logic[i].state = 'patrol'
 	logic[i].npc = npcModel
 	logic[i].humanoid = npcModel:FindFirstChild('Humanoid')
-	logic[i].Animator = logic[i].humanoid:WaitForChild('Animator')
+	logic[i].Animator = logic[i].humanoid:WaitForChild('Animator')	--animator loading
 	logic[i].hrp = npcModel:FindFirstChild('HumanoidRootPart')
 	logic[i].currentPosition = logic[i].hrp.Position
 	logic[i].id = randomID
